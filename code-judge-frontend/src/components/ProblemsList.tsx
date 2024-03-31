@@ -4,14 +4,12 @@ import { fetchProblemsListData } from "../utils/ProblemDataManager";
 
 interface ProblemsListProps {
   problemCategories: string[];
-  problems: string[];
   setChosenProblemTitle: (title: string) => void;
   callback: () => void;
 }
 
 const ProblemsList = ({
   problemCategories,
-  problems,
   setChosenProblemTitle,
   callback,
 }: ProblemsListProps) => {
@@ -23,14 +21,13 @@ const ProblemsList = ({
 
   useEffect(() => {
     const problemsListString = localStorage.getItem("problemsList");
-    if (problemsListString !== null) {
+    if (!problemsListString && problemsListString !== null) {
       setProblemsList(JSON.parse(problemsListString));
-    }
-    else {
+    } else {
       fetchProblemsListData(setProblemsList);
       localStorage.setItem("problemsList", JSON.stringify(problemsList));
     }
-  }, [])
+  }, []);
 
   return (
     <div className="d-flex flex-column gap-2">
@@ -53,16 +50,18 @@ const ProblemsList = ({
       <div className="border rounded p-2">
         <p>Available Problems:</p>
         <div className="d-flex flex-column gap-2">
-          {problems.map((problemTitle: string, index: number) => (
-            <div key={index} className="d-inline-flex flex-row gap-2">
-              <button
-                className="btn btn-light d-inline-block border rounded-pill p-2"
-                onClick={() => selectProblem(problemTitle)}
-              >
-                {index + 1}. {problemTitle}
-              </button>
-            </div>
-          ))}
+          {problemsList
+            ? problemsList.map((problemTitle: string, index: number) => (
+                <div key={index} className="d-inline-flex flex-row gap-2">
+                  <button
+                    className="btn btn-light d-inline-block border rounded-pill p-2"
+                    onClick={() => selectProblem(problemTitle)}
+                  >
+                    {index + 1}. {problemTitle}
+                  </button>
+                </div>
+              ))
+            : "Loading"}
         </div>
       </div>
     </div>

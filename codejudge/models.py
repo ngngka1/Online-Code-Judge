@@ -1,7 +1,7 @@
 from django.db import models
 
 class Problem(models.Model):
-    title = models.CharField(max_length=200) # title of the problem
+    title = models.CharField(max_length=200, primary_key=True) # title of the problem
     description = models.CharField(max_length=1000) # description of the problem
     exampleTestcases = models.TextField(default="") # a stringified JSON, which contains the example
     # testcases and the expected output in the following format:

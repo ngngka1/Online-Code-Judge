@@ -6,7 +6,7 @@ urlpatterns = [
     path("submit-code/", views.submit_code),
     path("settings/", views.update_settings),
     path("create-problem/", views.create_problem),
-    path("get-problem/<problem_title:str>", views.get_problem),
-    path("update-problem/<problem_title:str>", views.update_problem),
-    path("get-problems-list", views.get_problem_list),
+    path("get-problem/<str:problem_title>", views.get_problem),
+    path("update-problem/<str:problem_title>", views.update_problem),
+    path("get-problems-list/", views.get_problem_list),
 ]

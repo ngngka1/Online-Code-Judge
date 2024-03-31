@@ -4,7 +4,7 @@ import SubmitProblemForm from "../components/SubmitProblemForm";
 import {
   ProblemDataInterface,
   fetchProblemDataByTitle,
-  problemDataInitialState
+  problemDataInitialState,
 } from "../utils/ProblemDataManager";
 
 const ManageProblemsPage = () => {
@@ -18,9 +18,9 @@ const ManageProblemsPage = () => {
     "Tree",
     "Database",
   ];
-  const problems = ["problem_1", "problem_2", "problem_3"];
   const [chosenProblemTitle, setChosenProblemTitle] = useState("");
-  const [chosenProblemData, setChosenProblemData] = useState<ProblemDataInterface>(problemDataInitialState);
+  const [chosenProblemData, setChosenProblemData] =
+    useState<ProblemDataInterface>(problemDataInitialState);
   var allowFetchRequest = true;
 
   const createNewProblem = useCallback(() => {
@@ -29,17 +29,18 @@ const ManageProblemsPage = () => {
   }, []);
 
   useEffect(() => {
-    allowFetchRequest = false;
-    if (allowFetchRequest) {
-      allowFetchRequest = false;
-      setTimeout(() => {
-        allowFetchRequest = true;
-      }, 5000);
-      fetchProblemDataByTitle(chosenProblemTitle, setChosenProblemData);
-    } else {
-      alert(
-        "You are making requests too quickly! Wait a second before making more requests."
-      );
+    if (chosenProblemTitle) {
+      if (allowFetchRequest) {
+        allowFetchRequest = false;
+        setTimeout(() => {
+          allowFetchRequest = true;
+        }, 5000);
+        fetchProblemDataByTitle(chosenProblemTitle, setChosenProblemData);
+      } else {
+        alert(
+          "You are making requests too quickly! Wait a second before making more requests."
+        );
+      }
     }
   }, [chosenProblemTitle]);
 
@@ -51,7 +52,6 @@ const ManageProblemsPage = () => {
           <p className="border rounded p-2">Current Problems:</p>
           <ProblemsList
             problemCategories={problemCategories}
-            problems={problems}
             setChosenProblemTitle={setChosenProblemTitle}
             callback={() => {}}
           ></ProblemsList>

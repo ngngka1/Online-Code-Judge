@@ -9,7 +9,7 @@ export interface exampleTestcase {
 export const exampleTestcaseInitialState: exampleTestcase = {
   testcase: "",
   output: "",
-}
+};
 
 export interface ProblemDataInterface {
   title: string;
@@ -22,13 +22,13 @@ export const problemDataInitialState: ProblemDataInterface = {
   title: "",
   description: "",
   expectedOutputType: "integer",
-  exampleTestcases: [{
-    testcase: "",
-    output: "",
-  }]
-}
-
-
+  exampleTestcases: [
+    {
+      testcase: "",
+      output: "",
+    },
+  ],
+};
 
 const { serverBaseUrl, APISuffix } = backendContextData;
 
@@ -40,7 +40,7 @@ export const fetchProblemDataByTitle = async (
     serverBaseUrl + APISuffix.codejudge.getProblemByTitle + problemTitle
   );
   const jsonData = await response.json();
-  // if (jsonData)
+  console.table(jsonData);
   setStateCallback(jsonData);
 };
 
@@ -52,7 +52,9 @@ export const fetchProblemsListData = async (
   );
   const jsonData = await response.json();
   // if (jsonData)
-  setStateCallback(jsonData);
+  setStateCallback(jsonData?.problemTitles);
+  console.log(response.statusText);
+  // console.table(jsonData)
 };
 
 export const updateProblemByTitle = async (
@@ -84,5 +86,5 @@ export const createProblem = async (problemData: ProblemDataInterface) => {
     },
     body: JSON.stringify(problemData),
   });
-  console.log(response.status);
+  console.log(response.statusText);
 };

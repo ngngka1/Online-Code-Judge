@@ -15,7 +15,6 @@ const ProblemsPage = () => {
     "Tree",
     "Database",
   ];
-  const problems = ["problem_1", "problem_2", "problem_3"];
 
   const [chosenProblemTitle, setChosenProblemTitle] = useState("");
 
@@ -34,7 +33,6 @@ const ProblemsPage = () => {
             element={
               <ProblemsList
                 problemCategories={problemCategories}
-                problems={problems}
                 setChosenProblemTitle={setChosenProblemTitle}
                 callback={() => navigate("problem/")}
               />

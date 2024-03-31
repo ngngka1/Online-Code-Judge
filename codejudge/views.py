@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse, HttpRequest, response
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
-from serializer import ProblemSerializer
+from .serializer import ProblemSerializer
 from rest_framework import status
 from .models import Problem
 import json
@@ -58,24 +58,27 @@ def get_problem(request: HttpRequest, problem_title: str):
     if request.method == "GET":
         problem = Problem.objects.filter(title=problem_title)
         if not problem.exists():
-            return HttpResponse(status.HTTP_404_NOT_FOUND)
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
         else:
-            json_data = serializers.serialize("json", [problem])[0]
+            problem = problem[0]
+            json_data = json.loads(serializers.serialize("json", [problem]))[0]["fields"]
+            json_data["title"] = problem_title
+            json_data["exampleTestcases"] = json.loads(json_data["exampleTestcases"])
             return JsonResponse(json_data)
     else:
-        return HttpResponse(status.HTTP_400_BAD_REQUEST)
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
     
 def get_problem_list(request: HttpRequest):
     if request.method == "GET":
         problems = Problem.objects.all()
         if not problems.exists():
-            return HttpResponse(status.HTTP_404_NOT_FOUND)
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
         else:
-            json_data = {"problemTitles": []}
-            json_data["problemTitles"].append(problem.title for problem in problems)
+            json_data = {}
+            json_data["problemTitles"] = list(problem.title for problem in problems)
             return JsonResponse(json_data)
     else:
-        return HttpResponse(status.HTTP_400_BAD_REQUEST)
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
         
 @csrf_exempt
 def create_problem(request: HttpRequest):
@@ -86,26 +89,23 @@ def create_problem(request: HttpRequest):
         "description": (str) description of the problem
         "exampleTestcases": (list | str) a list of example testcases and output in the following format:
         [
-            {"testcase1": "some string", "output1": "some string"}, 
-            {"testcase2": "some string", "output2": "some string"}
+            {"testcase": "some string1", "output": "some string1"}, 
+            {"testcase": "some string2", "output": "some string2"}
         ]
         "expectedOutputType": (optional) (str) expected output type
     """
     ## before running this, should check the auth of the requester
-    
     if request.method == "POST":
         json_data = json.loads(request.body)
         if json_data:
             if "exampleTestcases" in json_data and type(json_data["exampleTestcases"]) is list:
+                print("example test cases parsed")
                 json_data["exampleTestcases"] = json.dumps(json_data["exampleTestcases"])
-                
             serializer = ProblemSerializer(data=json_data)
             if serializer.is_valid():
                 serializer.save()
-            else:
-                return HttpResponse("Invalid Input or JSON", status=400)
-    else:
-        return HttpResponse(status.HTTP_400_BAD_REQUEST)
+                return HttpResponse(status=status.HTTP_200_OK)
+    return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
                 
 def update_problem(request: HttpRequest, problem_title: str):
     if request.method == "UPDATE":
