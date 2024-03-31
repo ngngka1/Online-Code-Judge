@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import ProblemsList from "../components/ProblemsList";
 import SubmitProblemForm from "../components/SubmitProblemForm";
 import {
@@ -6,6 +6,8 @@ import {
   fetchProblemDataByTitle,
   problemDataInitialState,
 } from "../utils/ProblemDataManager";
+import OrientationChangeButton from "../components/OrientationChangeButton";
+import { orientationContext } from "../contexts/OrientationContext";
 
 const ManageProblemsPage = () => {
   const problemCategories = [
@@ -18,15 +20,11 @@ const ManageProblemsPage = () => {
     "Tree",
     "Database",
   ];
+  const { localOrientation } = useContext(orientationContext);
   const [chosenProblemTitle, setChosenProblemTitle] = useState("");
   const [chosenProblemData, setChosenProblemData] =
     useState<ProblemDataInterface>(problemDataInitialState);
   var allowFetchRequest = true;
-
-  const createNewProblem = useCallback(() => {
-    setChosenProblemTitle("");
-    //zzzz
-  }, []);
 
   useEffect(() => {
     if (chosenProblemTitle) {
@@ -47,19 +45,29 @@ const ManageProblemsPage = () => {
   return (
     <div className="p-5">
       <header className="text-center">Problems</header>
-      <div className="d-flex border rounded p-5 gap-3">
-        <div className="flex-grow-1 width-0">
-          <p className="border rounded p-2">Current Problems:</p>
-          <ProblemsList
-            problemCategories={problemCategories}
-            setChosenProblemTitle={setChosenProblemTitle}
-            callback={() => {}}
-          ></ProblemsList>
+      <div className="border rounded p-5">
+        <div className="d-flex flex-row-reverse">
+          <OrientationChangeButton />
         </div>
-        <div className="flex-grow-1 border rounded p-2 width-0">
-          <SubmitProblemForm
-            chosenProblemData={chosenProblemData}
-          ></SubmitProblemForm>
+        <div
+          className={
+            "d-flex gap-3 " +
+            (localOrientation.landscape ? "flex-row" : "flex-column")
+          }
+        >
+          <div className="flex-grow-1">
+            <p className="border rounded p-2">Current Problems:</p>
+            <ProblemsList
+              problemCategories={problemCategories}
+              setChosenProblemTitle={setChosenProblemTitle}
+              callback={() => {}}
+            ></ProblemsList>
+          </div>
+          <div className="flex-grow-1 border rounded p-2">
+            <SubmitProblemForm
+              chosenProblemData={chosenProblemData}
+            ></SubmitProblemForm>
+          </div>
         </div>
       </div>
     </div>

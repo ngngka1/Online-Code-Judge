@@ -9,6 +9,8 @@ import {
   problemDataInitialState,
 } from "../utils/ProblemDataManager";
 import { ProblemDataInterface } from "../utils/ProblemDataManager";
+import { orientationContext } from "../contexts/OrientationContext";
+import OrientationChangeButton from "./OrientationChangeButton";
 
 interface ProblemProps {
   chosenProblemTitle: string;
@@ -18,7 +20,7 @@ const Problem = ({ chosenProblemTitle }: ProblemProps) => {
   const [inputCode, setInputCode] = useState("");
   const [output, setOutput] = useState("");
   const { serverBaseUrl, APISuffix } = useContext(BackendContext);
-  const [landscapeMode, setLandscapeMode] = useState(false);
+  const { localOrientation } = useContext(orientationContext);
   const [problemData, setProblemData] = useState<ProblemDataInterface>(
     problemDataInitialState
   );
@@ -38,16 +40,12 @@ const Problem = ({ chosenProblemTitle }: ProblemProps) => {
   ) : (
     <>
       <div className="d-flex flex-row-reverse">
-        <button
-          className="btn btn-success mb-3"
-          onClick={() => setLandscapeMode(!landscapeMode)}
-        >
-          Change display mode to: {landscapeMode ? "portrait" : "landscape"}
-        </button>
+        <OrientationChangeButton />
       </div>
       <div
         className={
-          "d-flex gap-5" + (landscapeMode ? " flex-row" : " flex-column")
+          "d-flex gap-5" +
+          (localOrientation.landscape ? " flex-row" : " flex-column")
         }
       >
         <div className="flex-grow-1 d-flex flex-column border rounded p-5 gap-2">
@@ -65,10 +63,12 @@ const Problem = ({ chosenProblemTitle }: ProblemProps) => {
                         <p>Example {index + 1}:</p>
                         <div className="d-flex flex-row gap-3">
                           <div className="flex-grow-1 text-bg-secondary rounded p-3">
-                            <p>Input:</p>"{exampleTestcase.testcase}"
+                            <p>Input:</p>
+                            {exampleTestcase.input}
                           </div>
                           <div className="flex-grow-1 text-bg-secondary rounded p-3">
-                            <p>Output:</p>"{exampleTestcase.output}"
+                            <p>Output:</p>
+                            {exampleTestcase.output}
                           </div>
                         </div>
                       </>
@@ -86,10 +86,12 @@ const Problem = ({ chosenProblemTitle }: ProblemProps) => {
               serverBaseUrl + APISuffix.codejudge.postRunCode
             }
           ></CodeEditor>
-          <TerminalPanel
-            output={output}
-            setSubmittedTerminalInput={() => {}}
-          ></TerminalPanel>
+          <div className="border rounded-5 ">
+            <TerminalPanel
+              output={output}
+              setSubmittedTerminalInput={() => {}}
+            />
+          </div>
         </div>
       </div>
     </>

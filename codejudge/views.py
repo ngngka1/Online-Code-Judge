@@ -99,19 +99,26 @@ def create_problem(request: HttpRequest):
         json_data = json.loads(request.body)
         if json_data:
             if "exampleTestcases" in json_data and type(json_data["exampleTestcases"]) is list:
-                print("example test cases parsed")
                 json_data["exampleTestcases"] = json.dumps(json_data["exampleTestcases"])
             serializer = ProblemSerializer(data=json_data)
             if serializer.is_valid():
                 serializer.save()
                 return HttpResponse(status=status.HTTP_200_OK)
     return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-                
+    
+@csrf_exempt            
 def update_problem(request: HttpRequest, problem_title: str):
-    if request.method == "UPDATE":
-        pass
-    else:
-        return HttpResponse(status.HTTP_400_BAD_REQUEST)
+    if request.method == "PUT":
+        json_data = json.loads(request.body)
+        target_problem = Problem.objects.get(title=problem_title)
+        if json_data:
+            if "exampleTestcases" in json_data and type(json_data["exampleTestcases"]) is list:
+                json_data["exampleTestcases"] = json.dumps(json_data["exampleTestcases"])
+            serializer = ProblemSerializer(target_problem, data=json_data)
+            if serializer.is_valid():
+                serializer.update(target_problem, json_data)
+                return HttpResponse(status=status.HTTP_200_OK)
+    return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 def update_settings(request: HttpRequest):
     return HttpResponse("abcdefg")

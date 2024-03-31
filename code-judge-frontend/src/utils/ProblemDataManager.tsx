@@ -2,29 +2,29 @@ import { useContext } from "react";
 import { backendContextData } from "../contexts/BackendContext";
 
 export interface exampleTestcase {
-  testcase: string;
+  input: string;
   output: string;
 }
 
 export const exampleTestcaseInitialState: exampleTestcase = {
-  testcase: "",
+  input: "",
   output: "",
 };
 
 export interface ProblemDataInterface {
   title: string;
   description: string;
-  expectedOutputType: "integer" | "string" | "list";
+  expectedOutputType: string;
   exampleTestcases: exampleTestcase[];
 }
 
 export const problemDataInitialState: ProblemDataInterface = {
   title: "",
   description: "",
-  expectedOutputType: "integer",
+  expectedOutputType: "",
   exampleTestcases: [
     {
-      testcase: "",
+      input: "",
       output: "",
     },
   ],
@@ -40,7 +40,7 @@ export const fetchProblemDataByTitle = async (
     serverBaseUrl + APISuffix.codejudge.getProblemByTitle + problemTitle
   );
   const jsonData = await response.json();
-  console.table(jsonData);
+  // console.table(jsonData);
   setStateCallback(jsonData);
 };
 
@@ -65,7 +65,7 @@ export const updateProblemByTitle = async (
     serverBaseUrl + APISuffix.codejudge.updateProblemByTitle + problemTitle;
 
   const response = await fetch(APIendpoint, {
-    method: "UPDATE",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
       // "X-CSRFToken": cookies.get("csrftoken"),

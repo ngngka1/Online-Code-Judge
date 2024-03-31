@@ -11,7 +11,7 @@ const TerminalPanel = ({
 }: TerminalPanelProps) => {
   const [input, setInput] = useState("");
   return (
-    <div className="d-flex flex-column border rounded-5 gap-2 p-4">
+    <div className="d-flex flex-column gap-2 p-4">
       <div>Terminal:</div>
       <div className="border rounded p-2 bg-black text-light cursor-text">
         <pre>

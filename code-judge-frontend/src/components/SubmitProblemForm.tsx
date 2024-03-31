@@ -1,4 +1,4 @@
-import React, { useReducer, ChangeEvent } from "react";
+import React, { useReducer, ChangeEvent, useEffect, useContext } from "react";
 import {
   ProblemDataInterface,
   problemDataInitialState,
@@ -7,17 +7,19 @@ import {
   exampleTestcase,
   exampleTestcaseInitialState,
 } from "../utils/ProblemDataManager";
-import { useNavigate } from "react-router-dom";
+import { act } from "react-dom/test-utils";
+import { orientationContext } from "../contexts/OrientationContext";
 
 interface SubmitProblemFormProps {
   chosenProblemData: ProblemDataInterface;
 }
 
 interface dispatchActionObject {
-  formElement: string;
-  value: string;
-  type: string;
+  formElement?: string;
+  value?: string;
+  type?: string;
   index?: number;
+  payload?: ProblemDataInterface;
 }
 
 // const recursiveModify = (
@@ -66,6 +68,12 @@ interface dispatchActionObject {
 //     return object;
 //   }
 // };
+const reducerActions = {
+  initialize: "initialize",
+  addTestcase: "addTestcase",
+  deleteTestcase: "deleteTestcase",
+  modifyField: "modifyField",
+};
 
 const reducer = (
   formState: ProblemDataInterface,
@@ -73,9 +81,9 @@ const reducer = (
 ) => {
   switch (action.type) {
     case "initialize": {
-      return problemDataInitialState;
+      return action?.payload ? action.payload : problemDataInitialState;
     }
-    case "push": {
+    case "addTestcase": {
       return {
         ...formState,
         exampleTestcases: formState.exampleTestcases
@@ -83,31 +91,33 @@ const reducer = (
           .concat(exampleTestcaseInitialState),
       };
     }
-    case "modify": {
-      if (action.formElement in formState) {
-        return { ...formState, [action.formElement]: action.value };
-      }
-      if (action.formElement.startsWith("exampleTestcases")) {
-        // very bad approach but i cant come up with a better one for now
-        const index = parseInt(
-          action.formElement.slice(
-            action.formElement.indexOf("[") + 1,
-            action.formElement.indexOf("]")
-          )
-        );
-        const property = action.formElement.slice(
-          action.formElement.indexOf(".") + 1
-        );
-        return {
-          ...formState,
-          exampleTestcases: formState.exampleTestcases.map(
-            (value: exampleTestcase, i: number) => {
-              return i !== index
-                ? value
-                : { ...value, [property]: action.value };
-            }
-          ),
-        };
+    case "modifyField": {
+      if (action.formElement) {
+        if (action.formElement in formState) {
+          return { ...formState, [action.formElement]: action.value };
+        }
+        if (action.formElement.startsWith("exampleTestcases")) {
+          // very bad approach but i cant come up with a better one for now
+          const index = parseInt(
+            action.formElement.slice(
+              action.formElement.indexOf("[") + 1,
+              action.formElement.indexOf("]")
+            )
+          );
+          const property = action.formElement.slice(
+            action.formElement.indexOf(".") + 1
+          );
+          return {
+            ...formState,
+            exampleTestcases: formState.exampleTestcases.map(
+              (value: exampleTestcase, i: number) => {
+                return i !== index
+                  ? value
+                  : { ...value, [property]: action.value };
+              }
+            ),
+          };
+        }
       }
       return formState;
     }
@@ -120,17 +130,30 @@ const reducer = (
       };
     }
   }
-
   return formState;
 };
 
 const SubmitProblemForm = ({ chosenProblemData }: SubmitProblemFormProps) => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useReducer(reducer, problemDataInitialState);
+  const { localOrientation } = useContext(orientationContext);
+  console.log("orientation.landscape: " + localOrientation.landscape);
 
-  const handleChanges = (event: ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (chosenProblemData)
+      setFormData({
+        type: reducerActions.initialize,
+        payload: chosenProblemData,
+      });
+  }, [chosenProblemData]);
+  const handleChanges = (
+    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const { name, value } = event.target;
-    setFormData({ formElement: name, value: value, type: "modify" });
+    setFormData({
+      formElement: name,
+      value: value,
+      type: reducerActions.modifyField,
+    });
   };
 
   const submitProblem = (event: React.FormEvent<HTMLFormElement>) => {
@@ -145,19 +168,18 @@ const SubmitProblemForm = ({ chosenProblemData }: SubmitProblemFormProps) => {
     window.location.reload();
   };
   const addTestcase = () => {
-    setFormData({ formElement: "", value: "", type: "push" });
+    setFormData({ type: reducerActions.addTestcase });
   };
   const deleteTestcase = (testcaseIndex: number) => {
     setFormData({
-      formElement: "",
-      value: "",
-      type: "deleteTestcase",
+      type: reducerActions.deleteTestcase,
       index: testcaseIndex,
     });
   };
 
   const discardChanges = () => {
-    setFormData({ formElement: "", value: "", type: "initialize" });
+    // setFormData({ formElement: "", value: "", type: "initialize" });
+    window.location.reload();
   };
 
   return (
@@ -165,13 +187,21 @@ const SubmitProblemForm = ({ chosenProblemData }: SubmitProblemFormProps) => {
       {chosenProblemData.title ? (
         <div className="d-flex justify-content-between">
           <div>Modifying problem: {chosenProblemData.title}</div>
-          <button className="btn btn-danger" onClick={discardChanges}>
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={discardChanges}
+          >
             ✗ Discard changes
           </button>
         </div>
       ) : (
         <div className="d-flex justify-content-end">
-          <button className="btn btn-danger" onClick={discardChanges}>
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={discardChanges}
+          >
             ✗ Discard
           </button>
         </div>
@@ -182,12 +212,14 @@ const SubmitProblemForm = ({ chosenProblemData }: SubmitProblemFormProps) => {
         className="border rounded"
         name="title"
         value={formData.title}
-        onChange={handleChanges}
+        onChange={(e: any) => {
+          handleChanges(e);
+          console.log(formData.title);
+        }}
       />
       <label>Description: </label>
-      <input
-        type="text"
-        className="border rounded"
+      <textarea
+        className="border rounded wrap text-area-resize"
         name="description"
         value={formData.description}
         onChange={handleChanges}
@@ -206,34 +238,52 @@ const SubmitProblemForm = ({ chosenProblemData }: SubmitProblemFormProps) => {
         {/* list of testcases */}
         {formData.exampleTestcases.map(
           (exampleTestcase: exampleTestcase, index: number) => (
-            <div className="d-flex flex-row border rounded p-2 gap-2">
+            <div
+              key={"Testcase" + index}
+              className="d-flex flex-row border rounded p-2 gap-2 flex-wrap"
+            >
               <button
+                type="button"
                 className="btn btn-danger"
                 onClick={() => deleteTestcase(index)}
               >
                 ✗
               </button>
-              <label>Example testcases: </label>
-              <input
-                type="text"
-                className="border rounded width-0 flex-grow-1"
-                name={"exampleTestcases[" + index + "].testcase"}
-                value={formData.exampleTestcases[index].testcase}
-                onChange={handleChanges}
-              />
-              <label>Expected output: </label>
-              <input
-                type="text"
-                className="border rounded width-0 flex-grow-1"
-                name={"exampleTestcases[" + index + "].output"}
-                value={formData.exampleTestcases[index].output}
-                onChange={handleChanges}
-              />
+              <div
+                className={
+                  "d-inline-flex" + localOrientation.landscape
+                    ? "flex-row"
+                    : "flex-column"
+                }
+              >
+                <div>
+                  <label>Example Input: </label>
+                  <textarea
+                    className="border rounded w-100"
+                    name={"exampleTestcases[" + index + "].input"}
+                    value={formData.exampleTestcases[index].input}
+                    onChange={handleChanges}
+                  />
+                </div>
+                <div>
+                  <label>Expected output: </label>
+                  <textarea
+                    className="border rounded w-100"
+                    name={"exampleTestcases[" + index + "].output"}
+                    value={formData.exampleTestcases[index].output}
+                    onChange={handleChanges}
+                  />
+                </div>
+              </div>
             </div>
           )
         )}
         <div className="d-flex justify-content-end">
-          <button className="btn btn-success" onClick={addTestcase}>
+          <button
+            type="button"
+            className="btn btn-success"
+            onClick={addTestcase}
+          >
             Add testcases
           </button>
         </div>

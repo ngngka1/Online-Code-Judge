@@ -35,3 +35,7 @@ body {
   height: 0;
 }
 
+.text-area-resize {
+  resize: vertical
+}
+
