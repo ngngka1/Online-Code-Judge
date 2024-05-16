@@ -2,14 +2,20 @@ import { useState } from "react";
 
 interface TerminalPanelProps {
   output: string;
-  setSubmittedTerminalInput: (terminalInput: string) => void;
+  pushSubmittedTerminalInput: (terminalInput: string) => void;
 }
 
 const TerminalPanel = ({
   output,
-  setSubmittedTerminalInput,
+  pushSubmittedTerminalInput,
 }: TerminalPanelProps) => {
   const [input, setInput] = useState("");
+  const submitTerminalInput = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    pushSubmittedTerminalInput(input + '\n');
+    setInput("");
+  }
+  
   return (
     <div className="d-flex flex-column gap-2 p-4">
       <div>Terminal:</div>
@@ -17,14 +23,15 @@ const TerminalPanel = ({
         <pre>
           {output}
           {output && (
-            <form onSubmit={() => setSubmittedTerminalInput(input)}>
+            <form onSubmit={submitTerminalInput} className="d-inline-block">
               <input
                 key="input"
                 type="text"
+                value={input}
                 onChange={(event) => {
                   setInput(event.target.value);
                 }}
-                className="d-inline-block bg-black bg-transparent transparent-input"
+                className="bg-black transparent-input"
               />
             </form>
           )}
@@ -32,6 +39,6 @@ const TerminalPanel = ({
       </div>
     </div>
   );
-};
+ }
 
 export default TerminalPanel;

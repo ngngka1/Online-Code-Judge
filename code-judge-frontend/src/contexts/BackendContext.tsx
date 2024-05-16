@@ -19,9 +19,10 @@ export interface BackendContextType {
   };
 }
 
+
 export const backendContextData = {
   serverBaseUrl: serverBaseUrl,
-  APISuffix: {
+  APISuffix: { // url suffix of api endpoints
     ide: {
       postRunCode: "ide/run-code/",
     },
@@ -35,6 +36,9 @@ export const backendContextData = {
     }
   },
 };
+export const codejudgeRunCodeEndPoint = backendContextData.serverBaseUrl + backendContextData.APISuffix.codejudge.postRunCode;
+export const ideRunCodeEndPoint = backendContextData.serverBaseUrl + backendContextData.APISuffix.ide.postRunCode;
+
 
 export const BackendContext =
   createContext<BackendContextType>(backendContextData);

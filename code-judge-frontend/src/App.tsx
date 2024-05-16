@@ -3,13 +3,15 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import { BackendContextProvider } from "./contexts/BackendContext";
 import { OrientationProvider } from "./contexts/OrientationContext";
-import IDEPage from "./pages/IDEPage";
+import React from "react";
+const LazyIdePage = React.lazy(() => import("./pages/IDEPage"))
 import HomePage from "./pages/HomePage";
 import ProblemsPage from "./pages/ProblemsPage";
 import ManageProblemsPage from "./pages/ManageProblemsPage";
 import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
 import NoPage from "./pages/NoPage";
+
 
 function App() {
   return (
@@ -20,7 +22,7 @@ function App() {
           <OrientationProvider>
             <Routes>
               <Route index element={<HomePage />} />
-              <Route path="/ide" element={<IDEPage />} />
+              <Route path="/ide" element={<React.Suspense fallback="Loading..."><LazyIdePage /></React.Suspense>} />
               <Route path="/create-problems" element={<ManageProblemsPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/Login" element={<LoginPage />} />

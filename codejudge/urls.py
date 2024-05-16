@@ -2,11 +2,11 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path("run-code/", views.run_code),
-    path("submit-code/", views.submit_code),
-    path("settings/", views.update_settings),
-    path("create-problem/", views.create_problem),
-    path("get-problem/<str:problem_title>", views.get_problem),
-    path("update-problem/<str:problem_title>", views.update_problem),
-    path("get-problems-list/", views.get_problem_list),
+    path("run-code/", views.runCode),
+    path("submit-code/", views.submitCode),
+    path("settings/", views.updateSettings),
+    path("create-problem/", views.createProblem),
+    path("get-problem/<str:problem_title>", views.getProblem),
+    path("update-problem/<str:problem_title>", views.updateProblem),
+    path("get-problems-list/", views.getProblemsList),
 ]

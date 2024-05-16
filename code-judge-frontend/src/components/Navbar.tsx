@@ -37,7 +37,7 @@ const Navbar = () => {
             </li>
           </ul>
 
-          <button className="btn btn-light border m-1">Log in</button>
+          <a className="btn btn-light border m-1" href="/login">Log in</a>
         </div>
       </div>
     </nav>

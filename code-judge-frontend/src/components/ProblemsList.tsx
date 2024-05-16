@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { json, useNavigate } from "react-router-dom";
 import { fetchProblemsListData } from "../utils/ProblemDataManager";
 
 interface ProblemsListProps {

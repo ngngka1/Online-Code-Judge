@@ -17,7 +17,6 @@ interface ProblemProps {
 }
 
 const Problem = ({ chosenProblemTitle }: ProblemProps) => {
-  const [inputCode, setInputCode] = useState("");
   const [output, setOutput] = useState("");
   const { serverBaseUrl, APISuffix } = useContext(BackendContext);
   const { localOrientation } = useContext(orientationContext);
@@ -81,16 +80,19 @@ const Problem = ({ chosenProblemTitle }: ProblemProps) => {
         <div className="flex-grow-1 d-flex flex-column border rounded gap-2 p-5">
           <CodeEditor
             fileName="Solution"
+            problemTitle={problemData.title}
             setOutput={setOutput}
             codeExecutionEndPoint={
               serverBaseUrl + APISuffix.codejudge.postRunCode
             }
+            // setSubmittedTerminalInput={CodeEditor.defaultProps.setSubmittedTerminalInput}
           ></CodeEditor>
           <div className="border rounded-5 ">
-            <TerminalPanel
+            Testcases panel WIP
+            {/* <TerminalPanel
               output={output}
-              setSubmittedTerminalInput={() => {}}
-            />
+              // submittedTerminalInput={TerminalPanel.defaultProps.submittedTerminalInput}
+            /> */}
           </div>
         </div>
       </div>

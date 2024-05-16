@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    # image: to be added
+    build:
+      context: ./
+      dockerfile: ./base/Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: backend_container
+    ports:
+      - 8000:8000
+    environment:
+      - SECRET_KEY
+
+  frontend:
+    # image: to be added
+    build:
+      context: ./dictionary_frontend
+      dockerfile: Dockerfile
+    container_name: frontend_container
+    ports:
+      - 4173:4173
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend

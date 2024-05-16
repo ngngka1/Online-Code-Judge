@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import { backendContextData } from "../contexts/BackendContext";
 
 export interface exampleTestcase {
@@ -44,6 +43,7 @@ export const fetchProblemDataByTitle = async (
   setStateCallback(jsonData);
 };
 
+// this function fetch the list of titles of problems from api endpoint
 export const fetchProblemsListData = async (
   setStateCallback: React.Dispatch<React.SetStateAction<Array<string>>>
 ) => {
@@ -57,6 +57,7 @@ export const fetchProblemsListData = async (
   // console.table(jsonData)
 };
 
+// this function updates the problem's data according to the title given
 export const updateProblemByTitle = async (
   problemData: ProblemDataInterface,
   problemTitle: string

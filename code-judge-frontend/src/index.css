@@ -35,6 +35,10 @@ body {
   height: 0;
 }
 
+.height-01 {
+  height: 1em;
+}
+
 .text-area-resize {
   resize: vertical
 }

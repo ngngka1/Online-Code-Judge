@@ -7,7 +7,6 @@ import {
   exampleTestcase,
   exampleTestcaseInitialState,
 } from "../utils/ProblemDataManager";
-import { act } from "react-dom/test-utils";
 import { orientationContext } from "../contexts/OrientationContext";
 
 interface SubmitProblemFormProps {

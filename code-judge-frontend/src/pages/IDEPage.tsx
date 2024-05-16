@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useCallback } from "react";
 import CodeEditor from "../components/CodeEditor";
 import TerminalPanel from "../components/TerminalPanel";
 import { BackendContext } from "../contexts/BackendContext";
@@ -7,9 +7,14 @@ import OrientationChangeButton from "../components/OrientationChangeButton";
 
 const IDEPage = () => {
   const [output, setOutput] = useState("");
-  const [submittedTerminalInput, setSubmittedTerminalInput] = useState("");
+  // const [submittedTerminalInput, setSubmittedTerminalInput] = useState("");
+  const [submittedTerminalInput, setSubmittedTerminalInput] = useState("")
   const { localOrientation } = useContext(orientationContext);
   const { serverBaseUrl, APISuffix } = useContext(BackendContext);
+
+  const pushSubmittedTerminalInput = (input: string) => {
+    setSubmittedTerminalInput(submittedTerminalInput + input);
+  }
   return (
     <div className="p-5">
       <div className="d-flex flex-row-reverse">
@@ -26,13 +31,15 @@ const IDEPage = () => {
             fileName="main"
             setOutput={setOutput}
             codeExecutionEndPoint={serverBaseUrl + APISuffix.ide.postRunCode}
+            submittedTerminalInput={submittedTerminalInput}
+            setSubmittedTerminalInput={setSubmittedTerminalInput}
           />
         </div>
         {/* <!-- Output --> */}
         <div className="flex-grow-1 border rounded-5">
           <TerminalPanel
             output={output}
-            setSubmittedTerminalInput={setSubmittedTerminalInput}
+            pushSubmittedTerminalInput={pushSubmittedTerminalInput}
           />
         </div>
       </div>
